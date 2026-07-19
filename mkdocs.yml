@@ -1,0 +1,29 @@
+site_name: Banco BanQuito — Arquitectura
+site_description: Architectural Decision Records y documentación de arquitectura del proyecto Banco BanQuito
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: default
+  features:
+    - navigation.sections
+    - navigation.expand
+    - toc.integrate
+    - search.suggest
+
+nav:
+  - Inicio: index.md
+  - ADR:
+      - Decision Log: adr/index.md
+      - Plantilla: adr/ADR-0000-template.md
+  - Arquitectura: architecture/
+  - Seguridad: security/
+  - Pruebas: testing/
+  - Interbancario: interbank/
+  - Evidencia: evidence/
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
+  - admonition

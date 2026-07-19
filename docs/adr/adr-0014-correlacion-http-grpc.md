@@ -1,0 +1,23 @@
+# ADR-0014 — Propagar correlación en HTTP y gRPC
+
+Status: Proposed
+Date: 2026-07-18
+Author: Mathius + equipos Core/Switch
+
+## Decision
+
+Toda petición HTTP recibida por un microservicio propaga un identificador de correlación mediante un filtro (`CorrelationIdFilter`/`CorrelationIdHolder`). Cuando esa petición deriva en una llamada gRPC interna, el mismo identificador se transmite como campo explícito dentro del mensaje gRPC, no como metadata de transporte.
+
+## Context
+
+Estado actual: los seis microservicios del Core implementan `CorrelationIdFilter` y `CorrelationIdHolder` en su paquete `shared/tracing`. En la llamada gRPC de `core-account-service` hacia `core-accounting-service` (`AccountingGrpcClient`), el `correlationId` se envía mediante `setCorrelationId(...)` como campo dentro del payload del mensaje gRPC; no se encontró un interceptor gRPC (`ServerInterceptor`/`ClientInterceptor`) que propague correlación vía Metadata.
+
+Problema/ASR: sin correlación de extremo a extremo, un fallo que atraviesa HTTP → gRPC (por ejemplo, un asiento contable rechazado por el Microservicio Contable) no se puede rastrear en logs distribuidos entre los microservicios involucrados.
+
+Restricciones: no existe todavía un interceptor gRPC genérico implementado; la propagación depende de que cada cliente gRPC incluya el campo manualmente en el mensaje.
+
+Alternativas consideradas: usar gRPC Metadata junto con un interceptor genérico reutilizable (más estándar y menos propenso a omisiones, pero no es el mecanismo actualmente implementado); no propagar correlación en gRPC y correlacionar solo por `TRANSACTION_UUID`/timestamp (descartada, insuficiente para trazabilidad exacta de una petición HTTP específica a través de múltiples saltos gRPC).
+
+Criterio de selección: documentar y mantener el mecanismo ya implementado y probado (campo explícito en el mensaje), reconociendo como riesgo abierto que un interceptor de Metadata sería más reutilizable a futuro si se agregan más microservicios internos.
+
+Impacto: todo nuevo cliente gRPC interno del Core debe incluir explícitamente el `correlationId` en el mensaje; no puede asumir que gRPC lo propaga automáticamente.
