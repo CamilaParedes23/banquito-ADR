@@ -2,7 +2,7 @@
 
 Status: Accepted
 Date: [Pendiente de confirmar con el historial del proyecto]
-Author: Equipo Banco BanQuito
+Author: Lenin
 
 ## Decision
 

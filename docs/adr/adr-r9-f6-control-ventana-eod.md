@@ -2,7 +2,7 @@
 
 Status: Accepted
 Date: 2026-06-19
-Author: Equipo Banco BanQuito
+Author: Lenin
 
 ## Decision
 

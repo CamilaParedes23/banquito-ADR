@@ -2,7 +2,7 @@
 
 Status: Proposed
 Date: 2026-07-18
-Author: Mathius + equipos Core/Switch
+Author: Lenin
 
 ## Decision
 

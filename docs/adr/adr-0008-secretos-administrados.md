@@ -2,7 +2,7 @@
 
 Status: Proposed
 Date: 2026-07-18
-Author: Mathius + Infraestructura
+Author: [PENDIENTE DE CONFIRMAR — la Guía Operativa marca este responsable como pendiente]
 
 ## Decision
 

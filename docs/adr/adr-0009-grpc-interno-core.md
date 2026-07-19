@@ -2,7 +2,7 @@
 
 Status: Proposed
 Date: 2026-07-18
-Author: Equipo Core
+Author: Lenin
 
 ## Decision
 

@@ -2,7 +2,7 @@
 
 Status: Proposed
 Date: 2026-07-18
-Author: Mathius, supervisado por PM
+Author: Mathius
 
 ## Decision
 
@@ -20,4 +20,4 @@ Alternativas consideradas: corte total ("big bang") migrando todos los microserv
 
 Criterio de selección: una transición gradual permite validar el nuevo esquema en un microservicio piloto antes de propagarlo al resto, reduciendo el radio de impacto de un fallo de migración.
 
-Impacto: durante la transición coexisten dos mecanismos de validación de identidad en el ecosistema; el orden y calendario de migración por microservicio queda `[PENDIENTE DE CONFIRMAR: secuencia de migración — Mathius/PM]`.
+Impacto: durante la transición coexisten dos mecanismos de validación de identidad en el ecosistema; el orden y calendario de migración por microservicio queda `[PENDIENTE DE CONFIRMAR: secuencia de migración — Mathius]`.
