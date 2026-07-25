@@ -21,3 +21,19 @@ Alternativas consideradas: mantener los documentos en Word/Google Docs compartid
 Criterio de selección: coherencia con el flujo de trabajo ya adoptado para el código (Git, Pull Request, revisión) y alineación directa con la recomendación de la Guía Operativa.
 
 Impacto: cada ADR nuevo se publica mediante Pull Request documental (ver flujo Git de la guía) y el Decision Log (`docs/adr/index.md`) debe actualizarse en el mismo PR que introduce el ADR.
+
+## Opciones consideradas
+
+- **Markdown versionado en Git, con MkDocs Material opcional (adoptada)**: la arquitectura se documenta como código, con historial, diff y revisión por Pull Request. Ventaja: coherencia con el flujo ya adoptado para el código y alineación directa con la Guía Operativa.
+- **Word/Google Docs compartido**: descartada por no ofrecer diff ni revisión por Pull Request, y por el riesgo de copias divergentes entre integrantes.
+- **Confluence como fuente única**: descartada explícitamente por la guía operativa, que solo la permite como portal o espejo, no como fuente de verdad.
+
+## Consecuencias
+
+Positivas:
+- Toda decisión arquitectónica queda versionada, con historial auditable de quién cambió qué y cuándo.
+- El flujo de Pull Request documental reutiliza la disciplina de revisión ya existente para el código.
+
+Negativas:
+- Introduce un paso adicional de proceso (PR documental) para cualquier cambio de arquitectura, incluso menor.
+- Exige mantener sincronizado el Decision Log (`docs/adr/index.md`) en cada PR que introduce un ADR nuevo, lo que depende de disciplina manual.

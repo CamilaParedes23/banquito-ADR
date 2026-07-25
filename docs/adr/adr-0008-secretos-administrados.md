@@ -21,3 +21,19 @@ Alternativas consideradas: mantener archivos `.env` configurados manualmente por
 Criterio de selección: extiende el patrón ya adoptado en el proyecto (placeholders más variables de entorno) hacia un backend administrado, en lugar de gestión manual dispersa.
 
 Impacto: el pipeline de despliegue cloud debe inyectar los secretos en tiempo de arranque del contenedor; ningún `application.yml` ni `.env` versionado debe contener valores reales de credenciales de producción.
+
+## Opciones consideradas
+
+- **Servicio de gestión de secretos administrado, inyectado como variable de entorno (adoptada)**: extiende el patrón ya adoptado en el proyecto (placeholders + variables de entorno) hacia un backend administrado. Ventaja: permite rotación y auditoría de acceso a credenciales, en vez de gestión manual dispersa.
+- **Archivos `.env` configurados manualmente por servidor cloud**: descartada por no ser auditable ni rotable, y por ser propensa a divergencia entre entornos.
+- **Commitear secretos cifrados dentro del repositorio**: descartada por el alto riesgo si se filtra la llave de cifrado.
+
+## Consecuencias
+
+Positivas:
+- Las credenciales de producción dejan de residir en archivos versionados, reduciendo el riesgo de filtración por el repositorio Git.
+- Habilita rotación y auditoría de acceso a secretos, algo que la gestión manual de `.env` no permite.
+
+Negativas:
+- El proveedor de gestión de secretos a adoptar queda `[PENDIENTE DE CONFIRMAR: Mathius + Infraestructura]`, lo que bloquea la implementación concreta.
+- El responsable de este ADR también queda `[PENDIENTE DE CONFIRMAR — la Guía Operativa marca este responsable como pendiente]`, lo que retrasa su seguimiento.

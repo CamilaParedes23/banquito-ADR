@@ -21,3 +21,19 @@ Alternativas consideradas: medir cobertura global de todo el proyecto sin restri
 Criterio de selección: cumplimiento directo y automatizado del requisito institucional, verificado en el pipeline de CI sin depender de revisión manual.
 
 Impacto: cualquier Pull Request que reduzca la cobertura de `controller`/`service` por debajo del 70 % rompe el pipeline de CI y no puede fusionarse sin corregirlo.
+
+## Opciones consideradas
+
+- **70 % mínimo restringido a `controller` y `service`, verificado por JaCoCo en `verify` (adoptada)**: cumplimiento directo y automatizado del requisito institucional. Ventaja: verificado en el pipeline de CI sin depender de revisión manual, y ya validado en los seis microservicios.
+- **Medir cobertura global de todo el proyecto sin restringir paquetes**: descartada por penalizar clases de infraestructura, DTO o configuración que no son objeto de prueba unitaria según el alcance institucional definido.
+- **Usar un umbral distinto al 70 %**: descartada por ser un requisito fijo del proyecto, no negociable por el equipo.
+
+## Consecuencias
+
+Positivas:
+- La calidad mínima de pruebas queda garantizada automáticamente en cada build, sin depender de revisión manual.
+- El alcance acotado a `controller`/`service` evita esfuerzo de prueba desproporcionado sobre código de infraestructura o configuración.
+
+Negativas:
+- Cualquier Pull Request que reduzca la cobertura de `controller`/`service` por debajo del 70 % rompe el pipeline de CI y no puede fusionarse sin corregirlo, lo que puede ralentizar entregas bajo presión de tiempo.
+- Al quedar `domain`, `infrastructure` y `shared` explícitamente fuera de la medición, esos paquetes pueden acumular deuda de pruebas sin que el pipeline lo detecte.

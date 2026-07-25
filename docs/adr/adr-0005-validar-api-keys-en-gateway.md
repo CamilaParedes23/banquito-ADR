@@ -21,3 +21,19 @@ Alternativas consideradas: validar la API Key en cada microservicio mediante un 
 Criterio de selección: separación de responsabilidades — el gateway gobierna el acceso de clientes externos (quién puede llamar a la API), el microservicio gobierna la autorización de negocio (qué puede hacer ese usuario ya autenticado, vía JWT/roles).
 
 Impacto: los microservicios deben asumir que toda petición que reciben ya superó la validación de API Key en el borde; no deben rechazar peticiones por ausencia de ese validador interno.
+
+## Opciones consideradas
+
+- **Validación exclusiva en Apigee (adoptada)**: la API Key se valida solo en el gateway (ADR-0004); los microservicios no implementan lógica propia. Ventaja: separación de responsabilidades clara entre acceso de clientes externos (gateway) y autorización de negocio (microservicio, vía JWT/roles).
+- **Validar la API Key en cada microservicio mediante un filtro compartido en una librería común**: descartada por duplicar lógica de seguridad en cada despliegue y dificultar la rotación de llaves.
+- **Omitir la validación de API Key y confiar únicamente en JWT de usuario**: descartada porque no todos los consumidores externos (por ejemplo, integraciones de sistema a sistema) tienen un usuario autenticado vía JWT.
+
+## Consecuencias
+
+Positivas:
+- Evita duplicar lógica de autenticación de borde en los seis (o más) microservicios del Core.
+- Centraliza la rotación y gestión de API Keys en un único componente (Apigee).
+
+Negativas:
+- Los microservicios quedan funcionalmente dependientes de que ADR-0004 (Apigee) esté implementado; sin gateway, no hay dónde validar la API Key de forma centralizada.
+- Un microservicio que reciba tráfico sin pasar por Apigee (por ejemplo, en pruebas locales o por una mala configuración de red) quedaría sin ninguna validación de API Key.

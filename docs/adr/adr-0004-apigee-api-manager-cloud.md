@@ -21,3 +21,19 @@ Alternativas consideradas: gateway propio basado en Spring Cloud Gateway u otro 
 Criterio de selección: Apigee es la herramienta de API Management ya asignada al equipo de despliegue cloud (Mathius/Luis) y cubre *rate limiting*, gestión de productos de API y punto único de entrada sin código adicional en cada microservicio.
 
 Impacto: los microservicios deben delegar la autenticación de borde y el control de tráfico al gateway (ver ADR-0005) y no deben reimplementar esa validación internamente.
+
+## Opciones consideradas
+
+- **Apigee como API Manager (adoptada)**: punto único de entrada para tráfico externo, con *rate limiting* y gestión de productos de API. Ventaja: herramienta ya asignada al equipo de despliegue cloud, sin código adicional en cada microservicio.
+- **Gateway propio (por ejemplo, Spring Cloud Gateway)**: descartada por la sobrecarga operativa de mantener infraestructura de gateway propia en un proyecto académico.
+- **Exposición directa de cada microservicio sin gateway**: descartada por incumplir el RF-05 del Switch V2 y ampliar la superficie de ataque.
+
+## Consecuencias
+
+Positivas:
+- Centraliza autenticación de borde, *rate limiting* y observabilidad de tráfico externo en un único componente, evitando que cada microservicio la replique.
+- Cumple explícitamente el RF-05 del documento "Switch de Pagos Masivos V2".
+
+Negativas:
+- El despliegue cloud gestionado queda fuera del alcance verificable desde este repositorio local; la configuración exacta de productos/proxies Apigee está `[PENDIENTE DE CONFIRMAR: proveedor cloud exacto — Mathius/Luis]`.
+- Introduce una dependencia crítica externa: si Apigee falla o está mal configurado, todo el tráfico externo hacia Core y Switch se ve afectado.

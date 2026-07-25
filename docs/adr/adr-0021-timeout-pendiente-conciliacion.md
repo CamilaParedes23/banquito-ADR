@@ -21,3 +21,19 @@ Alternativas consideradas: reintentar automáticamente de inmediato ante cualqui
 Criterio de selección: un estado intermedio explícito ("Pendiente de Conciliación") es el único que no asume un resultado no confirmado, siguiendo el mismo principio de resiliencia sin pérdida de información que ya rige el procesamiento de lotes en el Switch (V1 y V2).
 
 Impacto: se requiere un proceso, manual o batch, de conciliación que resuelva estas operaciones contra el estado real reportado por la Cámara de Compensación; su diseño exacto queda `[PENDIENTE DE CONFIRMAR: Lenin + Mateo]`.
+
+## Opciones consideradas
+
+- **Estado intermedio explícito "Pendiente de Conciliación" (adoptada)**: no asume un resultado no confirmado ante un timeout. Ventaja: sigue el mismo principio de resiliencia sin pérdida de información que ya rige el procesamiento de lotes en el Switch (V1 y V2), y depende de la clave de idempotencia estable (ADR-0020) para reconciliar después.
+- **Reintentar automáticamente de inmediato ante cualquier timeout**: descartada por el riesgo de duplicar el pago si la operación original sí se procesó del otro lado.
+- **Marcar como fallida y liberar la posición prefondeada (ADR-0018) de inmediato**: descartada por el mismo riesgo de duplicidad si la operación remota sí tuvo éxito.
+
+## Consecuencias
+
+Positivas:
+- Evita tanto el riesgo de pago duplicado (por reintento ciego) como el riesgo de ocultar una falla real (por marcar éxito sin confirmación).
+- Es consistente con el principio de resiliencia ya aplicado al procesamiento de lotes del Switch (RF-04 V1, RF-06 V2).
+
+Negativas:
+- Se requiere un proceso, manual o batch, de conciliación que resuelva estas operaciones contra el estado real reportado por la Cámara de Compensación; su diseño exacto queda `[PENDIENTE DE CONFIRMAR: Lenin + Mateo]`.
+- Mientras una operación permanece "Pendiente de Conciliación", los fondos asociados quedan en un limbo operativo (ni liberados ni confirmados), lo que puede afectar la disponibilidad de la posición prefondeada (ADR-0018).

@@ -21,3 +21,19 @@ Alternativas consideradas: REST/JSON para llamadas internas entre microservicios
 Criterio de selección: gRPC ya está implementado y probado entre Cuentas, Contable y Admin, y cumple el requisito explícito de comunicación síncrona fuertemente tipada del documento Core V2.
 
 Impacto: todo microservicio interno nuevo del Core que necesite comunicación síncrona con otro microservicio del Core debe usar gRPC, no REST.
+
+## Opciones consideradas
+
+- **gRPC para comunicación interna del Core (adoptada)**: contrato fuertemente tipado y eficiente entre microservicios internos. Ventaja: ya está implementado y probado entre Cuentas, Contable y Admin, y cumple el requisito explícito de comunicación síncrona del documento Core V2.
+- **REST/JSON para llamadas internas entre microservicios del Core**: descartada por su mayor overhead de serialización y por no ofrecer un contrato fuertemente tipado entre servicios que cambian con frecuencia.
+- **Mensajería asíncrona para esta comunicación**: descartada porque la generación del asiento contable debe confirmarse de forma síncrona antes de responder, según el RF-01 de Core V2 y su regla de compensación ante rechazo o timeout.
+
+## Consecuencias
+
+Positivas:
+- Contrato fuertemente tipado entre microservicios internos, con menor overhead de serialización que REST/JSON.
+- Reutiliza un mecanismo ya implementado y probado (`AccountingGrpcClient`/`AccountingGrpcService`), sin necesidad de introducir infraestructura nueva.
+
+Negativas:
+- El uso queda restringido exclusivamente a comunicación interna; no reemplaza el mecanismo de propagación de correlación (ver ADR-0014), que debe gestionarse explícitamente por cada cliente gRPC.
+- Todo microservicio interno nuevo queda obligado a adoptar gRPC, lo que exige que el equipo mantenga conocimiento de Protocol Buffers y su tooling.

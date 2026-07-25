@@ -21,3 +21,19 @@ Alternativas consideradas: adoptar el mismo broker en el Core por uniformidad te
 Criterio de selección: cada sistema adopta el estilo de comunicación que exige su propio documento de requisitos — el Switch necesita desacoplar la ingesta masiva de pagos (HTTP 202 Accepted inmediato) y procesar líneas concurrentemente; el Core necesita consistencia transaccional inmediata para no dejar saldos y asientos contables inconsistentes.
 
 Impacto: la tecnología específica de broker `[PENDIENTE DE CONFIRMAR: RabbitMQ vs Kafka — equipo Switch/Mateo]` es responsabilidad exclusiva del equipo Switch; el Core solo expone endpoints síncronos para que el Switch los consuma.
+
+## Opciones consideradas
+
+- **Broker limitado al Switch (adoptada)**: cada sistema adopta el estilo de comunicación que exige su propio documento de requisitos. Ventaja: el Switch desacopla la ingesta masiva de pagos (HTTP 202 Accepted inmediato) sin imponer complejidad de mensajería asíncrona al Core.
+- **Adoptar el mismo broker en el Core por uniformidad tecnológica**: descartada porque ningún requisito de Core V2 exige asincronía, y complicaría el patrón de compensación síncrona ya definido en el RF-01.
+- **No usar broker ni siquiera en el Switch**: descartada por incumplir explícitamente el alcance de la Fase 2 del Switch V2.
+
+## Consecuencias
+
+Positivas:
+- El Core conserva su modelo de consistencia transaccional inmediata (partida doble, EOD) sin la complejidad operativa de colas muertas y reintentos asíncronos.
+- El Switch puede desacoplar la ingesta masiva de pagos y procesar líneas concurrentemente, cumpliendo su RF-02/RF-03.
+
+Negativas:
+- La tecnología específica de broker (RabbitMQ vs Kafka) queda `[PENDIENTE DE CONFIRMAR — equipo Switch/Mateo]`, lo que bloquea el diseño detallado del Switch.
+- El sistema queda con dos estilos de comunicación distintos (síncrono en Core, asíncrono en Switch), lo que exige que el equipo domine ambos paradigmas.

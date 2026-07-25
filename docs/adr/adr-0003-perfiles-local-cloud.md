@@ -21,3 +21,19 @@ Alternativas consideradas: variables de entorno puras sin perfiles de Spring (de
 Criterio de selección: uso del mecanismo estándar de Spring Boot (`spring.profiles.active`), ya validado y en uso en los seis microservicios sin necesidad de librerías adicionales.
 
 Impacto: todo microservicio nuevo debe seguir el mismo patrón de dos archivos de configuración; el pipeline de despliegue cloud es responsable de fijar el perfil correcto en tiempo de arranque.
+
+## Opciones consideradas
+
+- **Perfiles de Spring (`application.yml` + `application-docker.yml`, adoptada)**: segmentación declarativa de propiedades por archivo, activada por `SPRING_PROFILES_ACTIVE`. Ventaja: mecanismo estándar de Spring Boot, ya validado en los seis microservicios sin librerías adicionales.
+- **Variables de entorno puras sin perfiles de Spring**: descartada por perder la segmentación declarativa de propiedades por archivo.
+- **Un único `application.yml` con todos los valores de todos los entornos mezclados**: descartada por mezclar configuración de desarrollo con valores sensibles de otros entornos en el mismo archivo.
+
+## Consecuencias
+
+Positivas:
+- El mismo artefacto compilado corre en Docker Compose local, en CI y en el entorno cloud, sin recompilar ni mantener binarios distintos.
+- La configuración de cada entorno queda declarativamente separada y fácil de auditar por archivo.
+
+Negativas:
+- Todo microservicio nuevo debe seguir el mismo patrón de dos archivos, lo que exige disciplina de equipo para no romper la convención.
+- El pipeline de despliegue cloud es responsable de fijar el perfil correcto en tiempo de arranque; un error de configuración en ese paso puede activar el perfil equivocado.

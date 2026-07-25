@@ -21,3 +21,19 @@ Alternativas consideradas: no exigir idempotencia y confiar en que el llamador (
 Criterio de selección: extender el patrón de idempotencia ya validado en el Core (UUID más rechazo por duplicidad) en vez de diseñar uno nuevo para el contexto Interbancario.
 
 Impacto: toda operación Off-Us debe originarse con una clave de idempotencia generada por quien la origina (ver ADR-0020) y propagarse sin modificación hasta la Cámara de Compensación.
+
+## Opciones consideradas
+
+- **Clave de idempotencia obligatoria en toda API interbancaria (adoptada)**: extiende el patrón de idempotencia ya validado en el Core (UUID más rechazo por duplicidad, RF-06) en vez de diseñar uno nuevo. Ventaja: compatible con el mecanismo ya implementado en `core-account-service`.
+- **No exigir idempotencia y confiar en que el llamador (Switch) nunca reintente**: descartada por contradecir el RF-01/RF-04 de Core V2, que ya contemplan timeouts y reversos como parte normal del flujo.
+- **Deduplicar solo por contenido del payload sin clave explícita**: descartada porque dos pagos legítimos con el mismo monto y beneficiario en el mismo día serían indistinguibles.
+
+## Consecuencias
+
+Positivas:
+- Reduce el riesgo de duplicar un pago hacia otro banco ante timeouts o reintentos en la comunicación con la Cámara de Compensación.
+- Reutiliza un patrón ya validado en el Core, sin necesidad de diseñar ni auditar un mecanismo de idempotencia nuevo.
+
+Negativas:
+- Depende de que la clave se genere una sola vez y se propague sin cambios en todos los saltos del flujo (ver ADR-0020); un error de propagación anula la protección.
+- Todo componente que exponga una API interbancaria queda obligado a validar la clave de idempotencia, lo que añade una responsabilidad adicional a cada integración nueva.

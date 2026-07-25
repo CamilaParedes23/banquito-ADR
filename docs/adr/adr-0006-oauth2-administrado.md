@@ -21,3 +21,19 @@ Alternativas consideradas: mantener JWT propio con rotación manual de llaves (d
 Criterio de selección: un proveedor OAuth2 administrado centraliza emisión, expiración, revocación y auditoría de tokens, y se integra de forma natural con Apigee (ADR-0004) como punto de validación de borde.
 
 Impacto: los microservicios deben migrar de validar firmas JWT propias a validar tokens emitidos por el proveedor OAuth2 (introspección o JWKS); afecta a todos los servicios que actualmente dependen de `jjwt`.
+
+## Opciones consideradas
+
+- **Proveedor OAuth2 administrado (adoptada)**: centraliza emisión, expiración, revocación y auditoría de tokens. Ventaja: se integra de forma natural con Apigee (ADR-0004) como punto de validación de borde y elimina la gestión manual de llaves de firma.
+- **Mantener JWT propio con rotación manual de llaves**: descartada por el riesgo operativo y la falta de soporte de introspección centralizada.
+- **Sesiones con estado en servidor**: descartada por ser incompatible con la arquitectura de microservicios sin estado ya adoptada.
+
+## Consecuencias
+
+Positivas:
+- La emisión, expiración y revocación de tokens queda centralizada y auditable, en lugar de gestionada manualmente en cada microservicio.
+- Reduce el riesgo operativo asociado a la rotación de llaves de firma propias.
+
+Negativas:
+- El proveedor OAuth2 específico a adoptar queda `[PENDIENTE DE CONFIRMAR: Mathius/Luis]`, lo que bloquea la implementación concreta.
+- La migración debe ser gradual (ver ADR-0007) para no romper los microservicios ya probados, lo que implica convivencia temporal de dos mecanismos de identidad.

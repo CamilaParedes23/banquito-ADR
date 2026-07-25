@@ -21,3 +21,19 @@ Alternativas consideradas: extender el Core de Cuentas actual para incluir compe
 Criterio de selección: DDD recomienda un bounded context por dominio con lenguaje ubicuo propio; "Interbancario" tiene vocabulario propio (Clearing, Settlement, Clearinghouse, Cuenta de Encaje) que no se solapa con "Cuentas de clientes" ni con "Enrutamiento de pagos".
 
 Impacto: implica un nuevo microservicio o módulo con su propio modelo de datos. Su forma exacta (microservicio nuevo vs. extensión de Contable) queda `[PENDIENTE DE CONFIRMAR: Lenin]`.
+
+## Opciones consideradas
+
+- **Contexto funcional "Interbancario" separado (adoptada)**: bounded context propio para Nostro/Vostro, compensación y liquidación con otras instituciones. Ventaja: DDD recomienda un bounded context por dominio con lenguaje ubicuo propio, y "Interbancario" tiene vocabulario propio (Clearing, Settlement, Clearinghouse, Cuenta de Encaje) que no se solapa con "Cuentas de clientes" ni con "Enrutamiento de pagos".
+- **Extender el Core de Cuentas actual para incluir compensación interbancaria**: descartada por mezclar el dominio de "cuentas de clientes de BanQuito" con "relaciones con otros bancos".
+- **Extender el Switch V2 sin un contexto propio**: descartada porque el Switch es orquestador de enrutamiento y no debe cargar con el modelo financiero de Nostro/Vostro.
+
+## Consecuencias
+
+Positivas:
+- Evita contaminar el modelo de datos del Core de Cuentas o del Switch con conceptos regulatorios (Clearing, Settlement, Cuenta de Encaje) que no aplican a operaciones locales.
+- Da una base clara sobre la cual construir el resto de decisiones interbancarias (ADR-0016 a ADR-0021).
+
+Negativas:
+- La forma exacta del contexto (microservicio nuevo vs. extensión de Contable) queda `[PENDIENTE DE CONFIRMAR: Lenin]`, lo que bloquea decisiones de implementación posteriores.
+- Al construirse en modo simulado (la Fase 2 del Switch V2 excluye la "Conexión Real con Entes Reguladores"), el contexto no queda validado contra el comportamiento real del Banco Central.

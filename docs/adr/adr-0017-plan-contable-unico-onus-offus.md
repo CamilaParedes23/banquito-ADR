@@ -21,3 +21,19 @@ Alternativas consideradas: un libro mayor separado para el contexto Interbancari
 Criterio de selección: reutilizar el Plan Único de Cuentas y el Microservicio Contable ya construidos evita duplicar la lógica de partida doble, EOD y particionamiento ya implementada.
 
 Impacto: el contexto Interbancario (ADR-0015) es cliente del Microservicio Contable existente, vía gRPC (ver ADR-0009), no un motor contable independiente.
+
+## Opciones consideradas
+
+- **Un único Plan de Cuentas y Microservicio Contable para On-Us y Off-Us (adoptada)**: agrega cuentas institucionales nuevas bajo la jerarquía existente. Ventaja: reutiliza el Plan Único de Cuentas y el Microservicio Contable ya construidos, evitando duplicar la lógica de partida doble, EOD y particionamiento ya implementada.
+- **Un libro mayor separado para el contexto Interbancario**: descartada por complicar el cierre EOD único que exige el RF-09 y duplicar la lógica de validación de cuadre.
+- **No distinguir contablemente On-Us de Off-Us**: descartada porque el banco necesita poder auditar por separado su exposición con cada institución externa.
+
+## Consecuencias
+
+Positivas:
+- Preserva la garantía de suma cero a nivel de todo el banco, sin necesidad de conciliar dos libros mayores distintos.
+- Evita duplicar el proceso EOD y el Balance de Comprobación exigidos en el RF-09 de Core V2.
+
+Negativas:
+- El contexto Interbancario queda funcionalmente dependiente del Microservicio Contable existente (vía gRPC, ADR-0009); no puede evolucionar su modelo contable de forma independiente.
+- Toda operación Off-Us nueva debe encajar en la jerarquía recursiva de `ACCOUNTING_ACCOUNT` ya definida, lo que limita la flexibilidad de modelado específico para el dominio interbancario.

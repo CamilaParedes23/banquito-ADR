@@ -21,3 +21,19 @@ Alternativas consideradas: usar gRPC Metadata junto con un interceptor genérico
 Criterio de selección: documentar y mantener el mecanismo ya implementado y probado (campo explícito en el mensaje), reconociendo como riesgo abierto que un interceptor de Metadata sería más reutilizable a futuro si se agregan más microservicios internos.
 
 Impacto: todo nuevo cliente gRPC interno del Core debe incluir explícitamente el `correlationId` en el mensaje; no puede asumir que gRPC lo propaga automáticamente.
+
+## Opciones consideradas
+
+- **Campo explícito de correlación dentro del mensaje gRPC (adoptada)**: documenta y mantiene el mecanismo ya implementado y probado (`setCorrelationId(...)`). Ventaja: es el patrón que ya funciona hoy en `AccountingGrpcClient`, sin requerir desarrollo adicional.
+- **gRPC Metadata junto con un interceptor genérico reutilizable**: más estándar y menos propenso a omisiones, pero no es el mecanismo actualmente implementado; queda como riesgo abierto a futuro si se agregan más microservicios internos.
+- **No propagar correlación en gRPC y correlacionar solo por `TRANSACTION_UUID`/timestamp**: descartada por ser insuficiente para trazabilidad exacta de una petición HTTP específica a través de múltiples saltos gRPC.
+
+## Consecuencias
+
+Positivas:
+- Permite rastrear en logs distribuidos un fallo que atraviesa HTTP → gRPC (por ejemplo, un asiento contable rechazado por el Microservicio Contable).
+- No requiere desarrollo adicional, ya que reutiliza un mecanismo ya implementado y probado.
+
+Negativas:
+- Todo nuevo cliente gRPC interno del Core debe incluir explícitamente el `correlationId` en el mensaje; una omisión humana rompe la trazabilidad para esa llamada, ya que gRPC no lo propaga automáticamente.
+- Al no existir todavía un interceptor gRPC genérico, la propagación depende de que cada cliente lo implemente manualmente, lo que no escala tan bien como un interceptor de Metadata si se agregan más microservicios internos.

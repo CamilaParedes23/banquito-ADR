@@ -21,3 +21,19 @@ Alternativas consideradas: generar una clave nueva en cada componente del flujo 
 Criterio de selección: una clave de idempotencia estable de extremo a extremo es el único diseño que garantiza que un reintento en cualquier salto sea detectable como duplicado en todos los sistemas involucrados.
 
 Impacto: el formato exacto de la clave (UUID v4, o compuesto con código de institución) queda `[PENDIENTE DE CONFIRMAR: Mateo]`; debe documentarse en el contrato de la API interbancaria (ADR-0019).
+
+## Opciones consideradas
+
+- **Clave generada una sola vez en el origen (Switch) y propagada sin cambios (adoptada)**: sobrevive a todos los saltos del flujo (Message Broker → Enrutamiento → Cola de Salida → Cámara de Compensación). Ventaja: es el único diseño que garantiza que un reintento en cualquier salto sea detectable como duplicado en todos los sistemas involucrados.
+- **Generar una clave nueva en cada componente del flujo**: descartada por romper la trazabilidad de extremo a extremo y anular el propósito de ADR-0019.
+- **Usar únicamente el UUID de transacción del Core como clave interbancaria**: descartada porque ese UUID identifica el movimiento contable local On-Us/Off-Us dentro del Core, no la operación de cara al banco externo, que puede requerir su propio formato.
+
+## Consecuencias
+
+Positivas:
+- Un reintento en cualquier punto del flujo (Switch, contexto Interbancario, Cámara de Compensación simulada) es detectable como duplicado, sin importar en qué salto ocurra.
+- Simplifica la conciliación de operaciones pendientes (ver ADR-0021), ya que la misma clave identifica la operación en todos los sistemas.
+
+Negativas:
+- La clave debe sobrevivir al cambio de protocolo, del evento interno del Message Broker al mensaje saliente hacia la Cámara de Compensación, lo que exige disciplina de propagación en cada componente intermedio.
+- El formato exacto de la clave (UUID v4, o compuesto con código de institución) queda `[PENDIENTE DE CONFIRMAR: Mateo]`, lo que bloquea la definición final del contrato de la API interbancaria (ADR-0019).

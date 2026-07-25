@@ -21,3 +21,19 @@ Alternativas consideradas: corte total ("big bang") migrando todos los microserv
 Criterio de selección: una transición gradual permite validar el nuevo esquema en un microservicio piloto antes de propagarlo al resto, reduciendo el radio de impacto de un fallo de migración.
 
 Impacto: durante la transición coexisten dos mecanismos de validación de identidad en el ecosistema; el orden y calendario de migración por microservicio queda `[PENDIENTE DE CONFIRMAR: secuencia de migración — Mathius]`.
+
+## Opciones consideradas
+
+- **Migración incremental, microservicio por microservicio (adoptada)**: permite validar el nuevo esquema en un microservicio piloto antes de propagarlo. Ventaja: reduce el radio de impacto de un fallo de migración y preserva la posibilidad de rollback.
+- **Corte total ("big bang") migrando todos los microservicios a OAuth2 en un solo release**: descartada por su alto riesgo y dificultad de revertir si un servicio falla.
+- **Mantener JWT propio indefinidamente sin migrar**: descartada por contradecir directamente ADR-0006.
+
+## Consecuencias
+
+Positivas:
+- Cada microservicio puede migrar sin arriesgar los flujos de seguridad ya validados en el resto del ecosistema.
+- Permite rollback acotado a un solo microservicio si la migración falla, en lugar de un incidente generalizado.
+
+Negativas:
+- Durante la transición coexisten dos mecanismos de validación de identidad (JWT propio y OAuth2 administrado), lo que añade complejidad operativa temporal.
+- El orden y calendario de migración por microservicio queda `[PENDIENTE DE CONFIRMAR: secuencia de migración — Mathius]`, lo que retrasa la planificación del corte completo.

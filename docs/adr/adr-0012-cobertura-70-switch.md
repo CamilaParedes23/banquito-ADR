@@ -23,3 +23,17 @@ Alternativas consideradas: ninguna evaluada todavía por falta de acceso al cód
 Criterio de selección: coherencia con ADR-0011, para mantener un único criterio de calidad de pruebas en todo el ecosistema Banco BanQuito (Core y Switch), tal como exige el requisito institucional original.
 
 Impacto: Julio debe confirmar si el o los microservicios del Switch ya tienen JaCoCo configurado con esta regla y su estado de cobertura actual; este ADR permanece `Proposed` hasta esa confirmación.
+
+## Opciones consideradas
+
+- **Aplicar la misma regla que ADR-0011 al Switch (adoptada)**: 70 % mínimo en `controller`/`service`, verificado por JaCoCo en `verify`. Ventaja: mantiene un único criterio de calidad de pruebas en todo el ecosistema Banco BanQuito (Core y Switch), tal como exige el requisito institucional original.
+- **Ninguna alternativa evaluada todavía**: por falta de acceso al código del Switch en el workspace revisado, no fue posible comparar esta regla contra otras configuraciones de cobertura.
+
+## Consecuencias
+
+Positivas:
+- Mantiene un único estándar de calidad de pruebas entre Core y Switch, evitando criterios divergentes entre equipos.
+
+Negativas:
+- El estado actual del Switch (repositorio, configuración de JaCoCo, cobertura existente) es `[PENDIENTE DE CONFIRMAR — el repositorio del Switch de Pagos Masivos no está presente en el workspace de trabajo revisado]`, por lo que no se puede verificar si la regla ya se cumple o si exige trabajo adicional.
+- El ADR permanece en `Proposed` hasta que Julio confirme el estado del código del Switch, lo que retrasa su adopción formal.
