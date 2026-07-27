@@ -1,37 +1,48 @@
-# banquito-architecture
+# banquito-ADR
 
-Repositorio documental de arquitectura del proyecto Banco BanQuito (Core + Switch de Pagos Masivos).
+Fuente de verdad documental de arquitectura para Banco BanQuito.
 
-Contiene los Architectural Decision Records (ADR) del proyecto y la documentación de arquitectura, seguridad, pruebas, interbancario y evidencias asociadas.
+## Evolución cubierta
 
-## Fuente de verdad
-
-Este repositorio (Markdown versionado en Git) es la única fuente de verdad documental. La publicación recomendada es un sitio generado con MkDocs Material a partir de `docs/`.
+1. **Monolito:** Core V1 y Switch V1.
+2. **Microservicios:** Core R9-J y Switch V2.
+3. **Microservicios-cloud:** Google API Gateway, Google OAuth y evolución hacia secretos/servicios administrados.
 
 ## Estructura
 
-```
-banquito-architecture/
-├── README.md
-├── mkdocs.yml
-└── docs/
-    ├── index.md
-    ├── adr/
-    │   ├── index.md              # Decision Log
-    │   ├── ADR-0000-template.md  # Plantilla compacta
-    │   └── adr-XXXX-*.md
-    ├── architecture/
-    ├── security/
-    ├── testing/
-    ├── interbank/
-    └── evidence/
-        └── historico/            # Versiones originales (pre-normalización) de los ADR históricos
+```text
+docs/
+├── adr/
+│   ├── monolito/
+│   ├── microservicios/
+│   ├── microservicios-cloud/
+│   ├── index.md
+│   └── ADR-0000-template.md
+├── asr/
+├── standards/
+├── governance/
+├── functional/
+└── evidence/
 ```
 
-## Cómo se gestionan los ADR
+## Publicación local
 
-Ver `docs/adr/index.md` (Decision Log) y la Guía Operativa para la Gestión de ADR del proyecto para el flujo completo, formato institucional (Decision + Context únicamente), numeración, estados y criterios de calidad.
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements-docs.txt
+mkdocs serve
+```
 
-## Responsables
+Validación previa a commit:
 
-Ver la tabla de organización del equipo en la Guía Operativa. Kevin es el custodio de ADR (numeración, plantilla, Decision Log, revisión editorial y publicación).
+```powershell
+mkdocs build --strict
+```
+
+## Gobierno
+
+- Un ADR contiene una sola decisión con alternativas y trade-offs.
+- `Status` y `Implementation Status` son ejes distintos.
+- Los requisitos, estándares y pantallas se documentan fuera del Decision Log.
+- Un ADR Accepted se reemplaza con otro ADR; no se reescribe para cambiar la historia.
