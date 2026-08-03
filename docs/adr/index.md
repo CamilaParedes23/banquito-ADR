@@ -1,6 +1,6 @@
 # Decision Log — Banco BanQuito
 
-El registro depurado contiene **28 decisiones/registros**: **12 Accepted**, **7 Proposed** y **9 Rejected/reclasificados**.
+El registro depurado contiene **28 decisiones/registros**: **18 Accepted**, **1 Proposed** y **9 Rejected/reclasificados**.
 
 `Status` representa el estado de la decisión. `Implementation Status` representa cuánto se ha materializado; una decisión puede estar Accepted y todavía In progress.
 
@@ -26,13 +26,13 @@ El registro depurado contiene **28 decisiones/registros**: **12 Accepted**, **7 
 | ADR-0012 | [Exigir 70 % de cobertura en controllers y services del Switch](microservicios-cloud/adr-0012-cobertura-70-switch.md) | Rejected | Not applicable | Microservicios-cloud | Julio | ASR-06 |
 | ADR-0013 | [Instrumentar servicios con Actuator y Micrometer](microservicios-cloud/adr-0013-actuator-micrometer.md) | Rejected | Not applicable | Microservicios-cloud | Mathius | ASR-04, ASR-05 |
 | ADR-0014 | [Propagar correlación en HTTP y gRPC](microservicios-cloud/adr-0014-correlacion-http-grpc.md) | Rejected | Not applicable | Microservicios-cloud | Lenin | ASR-04 |
-| ADR-0015 | [Crear un bounded context interbancario separado](microservicios-cloud/adr-0015-contexto-interbancario-separado.md) | Proposed | Not started | Microservicios-cloud | Lenin | ASR-07 |
-| ADR-0016 | [Representar Nostro/Vostro fuera de las cuentas de clientes](microservicios-cloud/adr-0016-nostro-vostro-fuera-cuentas-cliente.md) | Proposed | Not started | Microservicios-cloud | Lenin | ASR-01, ASR-07 |
-| ADR-0017 | [Mantener un único plan contable para operaciones On-Us y Off-Us](microservicios-cloud/adr-0017-plan-contable-unico-onus-offus.md) | Proposed | Not started | Microservicios-cloud | Lenin | ASR-01, ASR-07 |
-| ADR-0018 | [Utilizar posiciones interbancarias prefondeadas para la simulación R9-K](microservicios-cloud/adr-0018-posiciones-prefondeadas.md) | Proposed | Not started | Microservicios-cloud | Lenin | ASR-01, ASR-07 |
+| ADR-0015 | [Crear un bounded context interbancario separado](microservicios-cloud/adr-0015-contexto-interbancario-separado.md) | Accepted | In progress | Microservicios-cloud | Lenin | ASR-07 |
+| ADR-0016 | [Representar Nostro/Vostro fuera de las cuentas de clientes](microservicios-cloud/adr-0016-nostro-vostro-fuera-cuentas-cliente.md) | Accepted | In progress | Microservicios-cloud | Lenin | ASR-01, ASR-07 |
+| ADR-0017 | [Mantener un único plan contable para operaciones On-Us y Off-Us](microservicios-cloud/adr-0017-plan-contable-unico-onus-offus.md) | Accepted | In progress | Microservicios-cloud | Lenin | ASR-01, ASR-07 |
+| ADR-0018 | [Utilizar posiciones interbancarias prefondeadas para la simulación R9-K](microservicios-cloud/adr-0018-posiciones-prefondeadas.md) | Accepted | In progress | Microservicios-cloud | Lenin | ASR-01, ASR-07 |
 | ADR-0019 | [Exponer una API interbancaria idempotente](microservicios-cloud/adr-0019-api-interbancaria-idempotente.md) | Rejected | Not applicable | Microservicios-cloud | Lenin | ASR-02, ASR-07 |
-| ADR-0020 | [Generar una clave de idempotencia estable en el Switch y propagarla extremo a extremo](microservicios-cloud/adr-0020-clave-idempotencia-estable.md) | Proposed | Not started | Microservicios-cloud | Lenin / Mateo | ASR-02, ASR-07 |
-| ADR-0021 | [Tratar timeouts remotos como pendientes de conciliación](microservicios-cloud/adr-0021-timeout-pendiente-conciliacion.md) | Proposed | Not started | Microservicios-cloud | Lenin / Mateo | ASR-01, ASR-02, ASR-05, ASR-07 |
+| ADR-0020 | [Generar una clave de idempotencia estable en el Switch y propagarla extremo a extremo](microservicios-cloud/adr-0020-clave-idempotencia-estable.md) | Accepted | In progress | Microservicios-cloud | Lenin / Mateo | ASR-02, ASR-07 |
+| ADR-0021 | [Tratar timeouts remotos como pendientes de conciliación](microservicios-cloud/adr-0021-timeout-pendiente-conciliacion.md) | Accepted | In progress | Microservicios-cloud | Lenin / Mateo | ASR-01, ASR-02, ASR-05, ASR-07 |
 | ADR-0022 | [Incorporar un módulo interbancario en los frontends](microservicios-cloud/adr-0022-modulo-interbancario-frontend.md) | Rejected | Not applicable | Microservicios-cloud | Kevin / Julio / Lenin | ASR-07 |
 
 ## Reglas de gobierno

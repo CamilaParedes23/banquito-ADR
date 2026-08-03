@@ -1,34 +1,38 @@
 # ADR-0016 — Representar Nostro/Vostro fuera de las cuentas de clientes
 
-Status: Proposed
-Implementation Status: Not started
+Status: Accepted
+Implementation Status: In progress
 Date: 2026-07-25
+Last Updated: 2026-08-03
 Author: Lenin
 Lifecycle: Microservicios-cloud
 ASR: ASR-01, ASR-07
 
 ## Decision
 
-Modelar Nostro/Vostro como posiciones/cuentas institucionales del contexto Interbancario y nunca como cuentas de clientes.
+Modelar Nostro/Vostro como cuentas institucionales vinculadas al Plan Único de Cuentas en `core-accounting-service`. Nunca se registrarán en la tabla `CUENTA` de clientes. Las cuentas externas solo se conservan como referencias de transferencia.
 
 ## Context
 
-Las reglas, titulares y estados de cuentas de clientes no corresponden a relaciones interbancarias. La opción propuesta extiende el patrón institucional del Core V2 y preserva trazabilidad contable.
+Las cuentas de clientes tienen titular, producto, estado y reglas retail/corporativas. Una posición corresponsal representa un activo o pasivo entre bancos y requiere naturaleza contable, moneda, contraparte y control de liquidez.
 
 ## Options considered
 
-- **Proposed — cuentas/posiciones institucionales.**
-- **Bandera en ACCOUNT:** descartada por contaminación del modelo.
-- **Tabla aislada sin vínculo contable:** descartada por pérdida de trazabilidad.
+- **Selected — `CUENTA_INSTITUCIONAL` + `CUENTA_CONTABLE`.**
+- **Bandera en `CUENTA`:** descartada por contaminación del modelo de clientes.
+- **Tabla sin vínculo al libro mayor:** descartada por pérdida de cuadre y trazabilidad.
 
 ## Consequences
 
 **Positive**
-- Evita aplicar reglas retail/corporativas a bancos.
+- Evita aplicar reglas de clientes a relaciones interbancarias.
+- Integra posiciones al EOD y balance de comprobación.
 
 **Negative / trade-offs**
-- Requiere integración explícita con el plan contable.
+- Cada contraparte y moneda requiere una cuenta funcional configurada.
 
-## Evidence
+## Implementation evidence
 
-- `BancoBanQuito-Core-V2.pdf pp. 5-6, 15`
+- Tipos `NOSTRO` y `VOSTRO` en `TipoCuentaInstitucionalEnum`.
+- Metadatos `ROUTING_CODE_CONTRAPARTE`, `MONEDA` y `NUMERO_CUENTA_CORRESPONSAL`.
+- `V5__nostro_vostro_institutional_accounts.sql`.

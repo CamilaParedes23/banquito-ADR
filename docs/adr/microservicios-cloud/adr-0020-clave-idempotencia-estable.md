@@ -1,8 +1,9 @@
 # ADR-0020 — Generar una clave de idempotencia estable en el Switch y propagarla extremo a extremo
 
-Status: Proposed
-Implementation Status: Not started
+Status: Accepted
+Implementation Status: In progress
 Date: 2026-07-25
+Last Updated: 2026-08-03
 Author: Lenin / Mateo
 Lifecycle: Microservicios-cloud
 ASR: ASR-02, ASR-07
@@ -10,27 +11,30 @@ Supersedes: ADR-0019
 
 ## Decision
 
-La clave de idempotencia Off-Us se genera una sola vez en el Switch y se propaga sin cambios por broker, contexto Interbancario, cámara simulada, contabilidad y conciliación.
+Usar `paymentLineUuid`, generado una sola vez por el Switch, como llave idempotente end-to-end. En la API banco a banco se envía también en el header `Idempotency-Key`; ambos valores deben coincidir. La identidad persistida es `(sourceRoutingCode, paymentLineUuid)`.
 
 ## Context
 
-Generar claves nuevas en cada salto rompe la detección de duplicados y la trazabilidad. El formato exacto y la persistencia todavía deben cerrarse en el contrato R9-K, por lo que permanece Proposed.
+El `reservationUuid` es interno al Switch y Core emisor y no debe exponerse al banco receptor. Generar nuevas claves por salto impide detectar replays y conciliar una línea única.
 
 ## Options considered
 
-- **Proposed — clave estable de origen.**
-- **Clave nueva por componente:** descartada.
-- **Usar solo UUID del movimiento local:** descartado porque no identifica toda la operación externa.
+- **Selected — `paymentLineUuid` estable y origen bancario.**
+- **UUID nuevo por componente:** descartado.
+- **Solo UUID de transacción local:** descartado; no representa toda la operación distribuida.
 
 ## Consequences
 
 **Positive**
-- Permite replay seguro y conciliación unívoca.
+- Un replay equivalente devuelve el resultado ya registrado sin mover dinero.
+- Un replay con payload distinto retorna conflicto.
 
 **Negative / trade-offs**
-- Todos los adaptadores deben preservar la clave y su semántica.
+- Todos los adaptadores deben preservar la clave y canonicalizar el payload.
 
-## Evidence
+## Implementation evidence
 
-- `BancoBanQuito-Corev1 RF-06 como antecedente`
-- `Alcance R9-K`
+- Índice único `(ROUTING_ORIGEN, PAYMENT_LINE_UUID)`.
+- Hash SHA-256 del payload financiero.
+- Header `Idempotency-Key` validado contra el cuerpo.
+- Métrica `banquito.interbank.idempotency.replays`.
