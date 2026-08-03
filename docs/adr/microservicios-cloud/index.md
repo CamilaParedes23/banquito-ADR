@@ -16,11 +16,11 @@ Registros asociados a la etapa **Microservicios-cloud**.
 | ADR-0012 | [Exigir 70 % de cobertura en controllers y services del Switch](adr-0012-cobertura-70-switch.md) | Rejected | Not applicable | ASR-06 |
 | ADR-0013 | [Instrumentar servicios con Actuator y Micrometer](adr-0013-actuator-micrometer.md) | Rejected | Not applicable | ASR-04, ASR-05 |
 | ADR-0014 | [Propagar correlación en HTTP y gRPC](adr-0014-correlacion-http-grpc.md) | Rejected | Not applicable | ASR-04 |
-| ADR-0015 | [Crear un bounded context interbancario separado](adr-0015-contexto-interbancario-separado.md) | Proposed | Not started | ASR-07 |
-| ADR-0016 | [Representar Nostro/Vostro fuera de las cuentas de clientes](adr-0016-nostro-vostro-fuera-cuentas-cliente.md) | Proposed | Not started | ASR-01, ASR-07 |
-| ADR-0017 | [Mantener un único plan contable para operaciones On-Us y Off-Us](adr-0017-plan-contable-unico-onus-offus.md) | Proposed | Not started | ASR-01, ASR-07 |
-| ADR-0018 | [Utilizar posiciones interbancarias prefondeadas para la simulación R9-K](adr-0018-posiciones-prefondeadas.md) | Proposed | Not started | ASR-01, ASR-07 |
+| ADR-0015 | [Crear un bounded context interbancario separado](adr-0015-contexto-interbancario-separado.md) | Accepted | In progress | ASR-07 |
+| ADR-0016 | [Representar Nostro/Vostro fuera de las cuentas de clientes](adr-0016-nostro-vostro-fuera-cuentas-cliente.md) | Accepted | In progress | ASR-01, ASR-07 |
+| ADR-0017 | [Mantener un único plan contable para operaciones On-Us y Off-Us](adr-0017-plan-contable-unico-onus-offus.md) | Accepted | In progress | ASR-01, ASR-07 |
+| ADR-0018 | [Utilizar posiciones interbancarias prefondeadas para la simulación R9-K](adr-0018-posiciones-prefondeadas.md) | Accepted | In progress | ASR-01, ASR-07 |
 | ADR-0019 | [Exponer una API interbancaria idempotente](adr-0019-api-interbancaria-idempotente.md) | Rejected | Not applicable | ASR-02, ASR-07 |
-| ADR-0020 | [Generar una clave de idempotencia estable en el Switch y propagarla extremo a extremo](adr-0020-clave-idempotencia-estable.md) | Proposed | Not started | ASR-02, ASR-07 |
-| ADR-0021 | [Tratar timeouts remotos como pendientes de conciliación](adr-0021-timeout-pendiente-conciliacion.md) | Proposed | Not started | ASR-01, ASR-02, ASR-05, ASR-07 |
+| ADR-0020 | [Generar una clave de idempotencia estable en el Switch y propagarla extremo a extremo](adr-0020-clave-idempotencia-estable.md) | Accepted | In progress | ASR-02, ASR-07 |
+| ADR-0021 | [Tratar timeouts remotos como pendientes de conciliación](adr-0021-timeout-pendiente-conciliacion.md) | Accepted | In progress | ASR-01, ASR-02, ASR-05, ASR-07 |
 | ADR-0022 | [Incorporar un módulo interbancario en los frontends](adr-0022-modulo-interbancario-frontend.md) | Rejected | Not applicable | ASR-07 |

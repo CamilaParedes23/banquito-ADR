@@ -1,33 +1,38 @@
 # ADR-0017 — Mantener un único plan contable para operaciones On-Us y Off-Us
 
-Status: Proposed
-Implementation Status: Not started
+Status: Accepted
+Implementation Status: In progress
 Date: 2026-07-25
+Last Updated: 2026-08-03
 Author: Lenin
 Lifecycle: Microservicios-cloud
 ASR: ASR-01, ASR-07
 
 ## Decision
 
-Registrar On-Us y Off-Us en el mismo Plan Único de Cuentas y Microservicio Contable, agregando cuentas institucionales bajo la jerarquía existente. No crear un libro mayor paralelo.
+Registrar operaciones On-Us y Off-Us en el mismo Plan Único de Cuentas y Microservicio Contable. Se agregan cuentas institucionales Nostro/Vostro bajo la jerarquía existente; no se crea un libro mayor paralelo.
 
 ## Context
 
-Dos libros mayores duplicarían EOD, balance y regla de suma cero. La decisión preserva una sola fuente contable corporativa, pero todavía debe validarse con el modelo físico de R9-K.
+Un segundo libro mayor duplicaría EOD, balance, reversos y regla de suma cero. El Core Contable ya es custodio de asientos y saldos institucionales.
 
 ## Options considered
 
-- **Proposed — libro mayor único.**
-- **Libro separado interbancario:** descartado por duplicación y conciliación adicional.
+- **Selected — libro mayor único.**
+- **Libro interbancario separado:** descartado por duplicación y conciliación adicional.
+- **Contabilidad en el Switch:** descartada por violar la responsabilidad del Core.
 
 ## Consequences
 
 **Positive**
-- Cuadre corporativo único.
+- Cuadre corporativo único y trazabilidad completa.
+- Reutiliza partida doble, reversos y EOD.
 
 **Negative / trade-offs**
-- Accounting recibe nuevas responsabilidades y contratos interbancarios.
+- Accounting valida liquidez de posiciones Nostro/Vostro además de suma cero.
 
-## Evidence
+## Implementation evidence
 
-- `BancoBanQuito-Core-V2.pdf RF-09 y Anexo 1`
+- Asiento saliente: débito `FONDOS_RESERVADOS_PM`, crédito `NOSTRO_<BANCO>_<MONEDA>`.
+- Asiento entrante: débito `VOSTRO_<BANCO>_<MONEDA>`, crédito `CLIENTES_PASIVO`.
+- Validación de saldo no negativo en `AccountingService`.

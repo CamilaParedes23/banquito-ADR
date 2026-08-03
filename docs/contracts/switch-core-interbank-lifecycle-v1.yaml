@@ -1,0 +1,53 @@
+openapi: 3.0.3
+info:
+  title: Banco BanQuito - Contrato interno Switch/Core R9-K
+  version: 1.0.0-r9k
+  description: Contrato interno. No debe ser consumido por el banco contraparte.
+paths:
+  /api/v1/switch-core/payment-reservations/{reservationUuid}/consume:
+    post:
+      summary: Consume una línea On-Us o prepara una línea Off-Us usando una reserva local
+      parameters:
+        - name: reservationUuid
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Reserva actualizada. Para Off-Us retorna Interbank-Transfer-Uuid en header.
+  /api/v1/interbank/transfers/{transferUuid}/confirm:
+    post:
+      summary: Confirma la liquidación remota de una salida Off-Us
+      parameters:
+        - name: transferUuid
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses: { '200': { description: Confirmada } }
+  /api/v1/interbank/transfers/{transferUuid}/reject:
+    post:
+      summary: Registra rechazo remoto y compensa reserva/asiento local
+      parameters:
+        - name: transferUuid
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses: { '200': { description: Rechazada y compensada } }
+  /api/v1/interbank/transfers/{transferUuid}/pending-reconciliation:
+    post:
+      summary: Marca timeout o resultado remoto desconocido
+      parameters:
+        - name: transferUuid
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses: { '200': { description: Pendiente de conciliación } }
+  /api/v1/interbank/transfers/{transferUuid}/reverse:
+    post:
+      summary: Reversa una transferencia interbancaria ya liquidada
+      parameters:
+        - name: transferUuid
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses: { '200': { description: Reversada } }

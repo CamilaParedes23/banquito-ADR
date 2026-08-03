@@ -1,35 +1,42 @@
 # ADR-0015 — Crear un bounded context interbancario separado
 
-Status: Proposed
-Implementation Status: Not started
+Status: Accepted
+Implementation Status: In progress
 Date: 2026-07-25
+Last Updated: 2026-08-03
 Author: Lenin
 Lifecycle: Microservicios-cloud
 ASR: ASR-07
 
 ## Decision
 
-Crear un contexto delimitado Interbancario, separado de Cuentas y del Switch, responsable de Nostro/Vostro, compensación, liquidación y conciliación con otras instituciones.
+Implementar el bounded context Interbancario como un módulo explícito dentro de `core-account-service` durante R9-K. No se crea un microservicio adicional en esta entrega. El módulo mantiene entidades, servicios, repositorios, endpoints y estados propios; las posiciones y asientos permanecen bajo `core-accounting-service`, y el Switch conserva la orquestación y el broker.
 
 ## Context
 
-El alcance R9-K introduce un lenguaje y responsabilidades que no pertenecen al Core de cuentas ni al enrutamiento del Switch. Aún debe resolverse si se materializa como microservicio independiente o como módulo con límites explícitos; por ello permanece Proposed.
+R9-K introduce Nostro/Vostro, liquidación, confirmación, rechazo, reverso y conciliación. Estas responsabilidades no deben mezclarse con las cuentas de clientes ni trasladarse al Switch. Extraer ahora un microservicio independiente agregaría repositorio, base, pipeline y fallos distribuidos sin aportar valor al alcance académico inmediato.
 
 ## Options considered
 
-- **Proposed — bounded context separado.**
-- **Extender Account:** descartado por mezclar cuentas de clientes y posiciones bancarias.
-- **Cargar el modelo en el Switch:** descartado porque el Switch es orquestador.
+- **Selected — módulo delimitado dentro de Account.** Mantiene separación lógica y reutiliza transacciones, reservas, auditoría, outbox y contratos gRPC existentes.
+- **Microservicio Interbancario independiente:** diferido; añade complejidad operativa prematura.
+- **Extender sin límites el servicio Account:** descartado; diluye el lenguaje y responsabilidades.
+- **Cargar Nostro/Vostro en el Switch:** descartado; el Switch es orquestador, no custodio financiero.
 
 ## Consequences
 
 **Positive**
-- Protege cohesión y lenguaje ubicuo.
+- Preserva el flujo On-Us y evita un despliegue adicional.
+- Mantiene una ruta clara de extracción futura si el contexto crece.
+- Reutiliza idempotencia, correlación, auditoría y compensaciones del Core.
 
 **Negative / trade-offs**
-- Añade un límite desplegable y contratos nuevos.
+- Account incorpora un módulo adicional y debe mantener límites de paquete y contrato.
+- La consistencia con Accounting sigue siendo distribuida y exige compensación.
 
-## Evidence
+## Implementation evidence
 
-- `Alcance R9-K definido por el equipo`
-- `BancoBanQuito-RequisitosFuncionales-SwitchPagosMasivosV2.pdf`
+- `core-account-service/.../TransferenciaInterbancaria.java`
+- `core-account-service/.../InterbankTransferService.java`
+- `core-account-service/.../InterbankTransferController.java`
+- `V10__interbank_transfer_lifecycle.sql`

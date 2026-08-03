@@ -1,0 +1,475 @@
+openapi: 3.0.3
+info:
+  title: Banco BanQuito - API Interbancaria Core
+  version: 1.0.0-r9k
+  description: 'Contrato banco a banco para recibir y consultar transferencias Off-Us.
+
+    El banco receptor no conoce ni utiliza reservationUuid; ese identificador
+
+    pertenece al flujo interno entre el Switch y el Core del banco emisor.
+
+    '
+servers:
+- url: https://{gatewayHost}
+  variables:
+    gatewayHost:
+      default: api.example.test
+security:
+- bearerAuth: []
+  apiKey: []
+tags:
+- name: Interbank transfers
+paths:
+  /api/v1/interbank/transfers/incoming:
+    post:
+      tags:
+      - Interbank transfers
+      operationId: receiveIncomingInterbankTransfer
+      summary: Recibe y liquida una transferencia interbancaria entrante
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomingInterbankTransferRequest'
+            example:
+              sourceTransferUuid: 1cc74ef1-5ff9-4c37-8625-6846d8642f70
+              paymentLineUuid: d2a13085-d6d4-446c-a9df-3454d84af650
+              batchUuid: 099a46c4-149c-45fb-89c6-aec8d43d2015
+              sourceRoutingCode: BQLL001
+              destinationRoutingCode: BQTO001
+              sourceAccountNumber: '1010100001'
+              destinationAccountNumber: '2020200100'
+              originatorIdentification: '1790012345001'
+              originatorName: Distribuciones Sierra Azul S.A.
+              beneficiaryIdentification: '0102030405'
+              beneficiaryName: María Fernanda Cárdenas Paredes
+              beneficiaryEmail: maria.cardenas@clientes.banquito.test
+              concept: Pago de nómina
+              amount: 25.5
+              currency: USD
+              accountingDate: '2026-08-02'
+              correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+      responses:
+        '200':
+          description: Transferencia liquidada o replay de un resultado existente
+          headers:
+            Idempotency-Replayed:
+              schema:
+                type: boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterbankTransferResponse'
+              examples:
+                settled:
+                  summary: Liquidación exitosa
+                  value: &id001
+                    interbankTransferUuid: dcd49b92-46b6-4b9a-85da-b2c44c3a9429
+                    sourceTransferUuid: 1cc74ef1-5ff9-4c37-8625-6846d8642f70
+                    paymentLineUuid: d2a13085-d6d4-446c-a9df-3454d84af650
+                    batchUuid: 099a46c4-149c-45fb-89c6-aec8d43d2015
+                    direction: ENTRANTE
+                    status: SETTLED
+                    sourceRoutingCode: BQLL001
+                    destinationRoutingCode: BQTO001
+                    sourceAccountNumber: '1010100001'
+                    destinationAccountNumber: '2020200100'
+                    amount: 25.5
+                    currency: USD
+                    destinationTransactionUuid: 8b49a130-e4c0-3d8f-9df9-d7c324ac31ad
+                    journalEntryUuid: 53df3de4-3da9-469c-b4c6-416dd8ab7e0a
+                    reversalTransactionUuid: null
+                    reversalJournalEntryUuid: null
+                    receiptNumber: IBI-8B49A130
+                    errorCode: null
+                    message: null
+                    accountingDate: '2026-08-02'
+                    processedAt: '2026-08-02T19:45:30.412'
+                    idempotencyReplayed: false
+                    correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+                idempotentReplay:
+                  summary: Reenvío idempotente del mismo payload
+                  value:
+                    interbankTransferUuid: dcd49b92-46b6-4b9a-85da-b2c44c3a9429
+                    sourceTransferUuid: 1cc74ef1-5ff9-4c37-8625-6846d8642f70
+                    paymentLineUuid: d2a13085-d6d4-446c-a9df-3454d84af650
+                    batchUuid: 099a46c4-149c-45fb-89c6-aec8d43d2015
+                    direction: ENTRANTE
+                    status: SETTLED
+                    sourceRoutingCode: BQLL001
+                    destinationRoutingCode: BQTO001
+                    sourceAccountNumber: '1010100001'
+                    destinationAccountNumber: '2020200100'
+                    amount: 25.5
+                    currency: USD
+                    destinationTransactionUuid: 8b49a130-e4c0-3d8f-9df9-d7c324ac31ad
+                    journalEntryUuid: 53df3de4-3da9-469c-b4c6-416dd8ab7e0a
+                    reversalTransactionUuid: null
+                    reversalJournalEntryUuid: null
+                    receiptNumber: IBI-8B49A130
+                    errorCode: null
+                    message: null
+                    accountingDate: '2026-08-02'
+                    processedAt: '2026-08-02T19:45:30.412'
+                    idempotencyReplayed: true
+                    correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Conflicto idempotente, routing, prefijo, estado o fecha contable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-08-02T19:47:45.000'
+                correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+                code: INTERBANK_IDEMPOTENCY_PAYLOAD_CONFLICT
+                message: La llave idempotente ya fue utilizada con un payload diferente
+                details: []
+        '422':
+          description: Rechazo financiero definitivo de la línea; el cuerpo conserva la evidencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterbankTransferResponse'
+              examples:
+                rejected:
+                  summary: Rechazo financiero definitivo
+                  value: &id002
+                    interbankTransferUuid: b7bbd314-bbaf-40c8-ae73-d4f55c3e67f8
+                    sourceTransferUuid: 1cc74ef1-5ff9-4c37-8625-6846d8642f70
+                    paymentLineUuid: d2a13085-d6d4-446c-a9df-3454d84af650
+                    batchUuid: 099a46c4-149c-45fb-89c6-aec8d43d2015
+                    direction: ENTRANTE
+                    status: REJECTED
+                    sourceRoutingCode: BQLL001
+                    destinationRoutingCode: BQTO001
+                    sourceAccountNumber: '1010100001'
+                    destinationAccountNumber: '2020200999'
+                    amount: 25.5
+                    currency: USD
+                    destinationTransactionUuid: null
+                    journalEntryUuid: null
+                    reversalTransactionUuid: null
+                    reversalJournalEntryUuid: null
+                    receiptNumber: null
+                    errorCode: INTERBANK_DESTINATION_ACCOUNT_NOT_FOUND
+                    message: La cuenta destino no existe en Banco BanQuito
+                    accountingDate: '2026-08-02'
+                    processedAt: '2026-08-02T19:46:15.120'
+                    idempotencyReplayed: false
+                    correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /api/v1/interbank/transfers/status:
+    get:
+      tags:
+      - Interbank transfers
+      operationId: getInterbankTransferStatus
+      summary: Consulta el resultado idempotente de una línea
+      parameters:
+      - name: sourceRoutingCode
+        in: query
+        required: true
+        schema:
+          type: string
+          maxLength: 20
+          example: BQLL001
+      - name: paymentLineUuid
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Estado actual de la transferencia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterbankTransferResponse'
+              examples:
+                settled:
+                  summary: Estado liquidado
+                  value: *id001
+                rejected:
+                  summary: Estado rechazado
+                  value: *id002
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Transferencia no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-08-02T19:47:30.000'
+                correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+                code: INTERBANK_TRANSFER_NOT_FOUND
+                message: No existe una transferencia para la llave consultada
+                details: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token técnico con scope core.interbank.receive o core.interbank.read.
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API Key administrada por el API Manager de la nube.
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Debe ser exactamente igual a paymentLineUuid.
+      schema:
+        type: string
+        format: uuid
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      description: Debe ser exactamente igual a correlationId del cuerpo.
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    IncomingInterbankTransferRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - sourceTransferUuid
+      - paymentLineUuid
+      - sourceRoutingCode
+      - destinationRoutingCode
+      - destinationAccountNumber
+      - beneficiaryIdentification
+      - beneficiaryName
+      - amount
+      - currency
+      - accountingDate
+      - correlationId
+      properties:
+        sourceTransferUuid:
+          type: string
+          format: uuid
+        paymentLineUuid:
+          type: string
+          format: uuid
+        batchUuid:
+          type: string
+          maxLength: 80
+          nullable: true
+        sourceRoutingCode:
+          type: string
+          maxLength: 20
+        destinationRoutingCode:
+          type: string
+          maxLength: 20
+        sourceAccountNumber:
+          type: string
+          maxLength: 34
+          nullable: true
+        destinationAccountNumber:
+          type: string
+          maxLength: 34
+        originatorIdentification:
+          type: string
+          maxLength: 20
+          nullable: true
+        originatorName:
+          type: string
+          maxLength: 180
+          nullable: true
+        beneficiaryIdentification:
+          type: string
+          maxLength: 20
+        beneficiaryName:
+          type: string
+          maxLength: 180
+        beneficiaryEmail:
+          type: string
+          format: email
+          maxLength: 160
+          nullable: true
+        concept:
+          type: string
+          maxLength: 250
+          nullable: true
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          multipleOf: 0.01
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          example: USD
+        accountingDate:
+          type: string
+          format: date
+        correlationId:
+          type: string
+          format: uuid
+    InterbankTransferResponse:
+      type: object
+      properties:
+        interbankTransferUuid:
+          type: string
+          format: uuid
+        sourceTransferUuid:
+          type: string
+          format: uuid
+        paymentLineUuid:
+          type: string
+          format: uuid
+        batchUuid:
+          type: string
+          nullable: true
+        direction:
+          type: string
+          enum:
+          - ENTRANTE
+          - SALIENTE
+        status:
+          type: string
+          enum:
+          - PREPARED
+          - SETTLED
+          - REJECTED
+          - PENDING_RECONCILIATION
+          - REVERSED
+        sourceRoutingCode:
+          type: string
+        destinationRoutingCode:
+          type: string
+        sourceAccountNumber:
+          type: string
+          nullable: true
+        destinationAccountNumber:
+          type: string
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+        destinationTransactionUuid:
+          type: string
+          format: uuid
+          nullable: true
+        journalEntryUuid:
+          type: string
+          format: uuid
+          nullable: true
+        reversalTransactionUuid:
+          type: string
+          format: uuid
+          nullable: true
+        reversalJournalEntryUuid:
+          type: string
+          format: uuid
+          nullable: true
+        receiptNumber:
+          type: string
+          nullable: true
+        errorCode:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        accountingDate:
+          type: string
+          format: date
+        processedAt:
+          type: string
+          format: date-time
+        idempotencyReplayed:
+          type: boolean
+        correlationId:
+          type: string
+          format: uuid
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        correlationId:
+          type: string
+          nullable: true
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+  responses:
+    BadRequest:
+      description: Request o headers inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: '2026-08-02T19:47:00.000'
+            correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+            code: VALIDATION_ERROR
+            message: Datos de entrada inválidos
+            details:
+            - 'paymentLineUuid: debe contener un UUID válido'
+    Unauthorized:
+      description: Token ausente o inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: '2026-08-02T19:47:00.000'
+            correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+            code: AUTH_TOKEN_INVALID
+            message: Token inválido o expirado
+            details: []
+    Forbidden:
+      description: Scope insuficiente
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: '2026-08-02T19:47:00.000'
+            correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+            code: SECURITY_ACCESS_DENIED
+            message: Acceso denegado. El token no posee permisos para este recurso.
+            details: []
+    ServerError:
+      description: Error técnico; no asumir resultado financiero y consultar estado antes de reintentar
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: '2026-08-02T19:47:00.000'
+            correlationId: 50aa11c7-a36c-432f-a3c1-d1a36ded0235
+            code: INTERNAL_ERROR
+            message: Error interno no controlado
+            details:
+            - IllegalStateException
